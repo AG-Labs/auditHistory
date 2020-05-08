@@ -1,0 +1,16 @@
+{
+  "name": "auto-lighthouse",
+  "version": "1.0.0",
+  "description": "Automatically run lighthouse scans",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "test"
+  },
+  "author": "AG-Labs",
+  "license": "ISC",
+  "dependencies": {
+    "lighthouse": "^5.6.0",
+    "yargs": "^15.3.1"
+  }
+}
