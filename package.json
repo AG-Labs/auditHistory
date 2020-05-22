@@ -10,7 +10,7 @@
   "author": "AG-Labs",
   "license": "ISC",
   "dependencies": {
-    "lighthouse": "^5.6.0",
+    "lighthouse": "^6.0.0",
     "yargs": "^15.3.1"
   }
 }
