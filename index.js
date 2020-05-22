@@ -1,8 +1,8 @@
 const lighthouse = require("lighthouse");
 const chromeLauncher = require("chrome-launcher");
 const argv = require("yargs").argv;
-const url = require("url");
 const fs = require("fs");
+const sites = require("./urls.json");
 
 const metricFilter = [
   "first-contentful-paint",
@@ -115,15 +115,16 @@ const main = async () => {
     await moveOldReport(dirName);
     await writeReport(lighthouseReport, dirName);
   } else {
-    const urlObj = new URL("https://www.ag-labs.io");
-    let dirName = prepareFolder(urlObj);
-    console.log("about to do report");
-    let lighthouseReport = await launchChromeAndRunLighthouse(urlObj.href);
+    sites.forEach(async site => {
+      const urlObj = new URL(site);
+      let dirName = prepareFolder(urlObj);
+      let lighthouseReport = await launchChromeAndRunLighthouse(urlObj.href);
 
-    compareReports(lighthouseReport.js, dirName);
+      compareReports(lighthouseReport.js, dirName);
 
-    await moveOldReport(dirName);
-    await writeReport(lighthouseReport, dirName);
+      await moveOldReport(dirName);
+      await writeReport(lighthouseReport, dirName);
+    });
   }
 };
 
