@@ -15,24 +15,24 @@ const metricFilter = [
   "first-cpu-idle",
   "interactive",
   "critical-request-chains",
-  "bootup-time"
+  "bootup-time",
 ];
 
-const launchChromeAndRunLighthouse = url => {
-  return chromeLauncher.launch().then(chrome => {
+const launchChromeAndRunLighthouse = (url) => {
+  return chromeLauncher.launch().then((chrome) => {
     const opts = {
-      port: chrome.port
+      port: chrome.port,
     };
-    return lighthouse(url, opts).then(results => {
+    return lighthouse(url, opts).then((results) => {
       return chrome.kill().then(() => ({
         js: results.lhr,
-        json: results.report
+        json: results.report,
       }));
     });
   });
 };
 
-const prepareFolder = inputURL => {
+const prepareFolder = (inputURL) => {
   let dirName = inputURL.host.replace("www.", "");
   if (inputURL.pathname !== "/") {
     dirName = dirName + inputURL.pathname.replace(/\//g, "_");
@@ -48,7 +48,7 @@ const writeReport = (results, inputDir) => {
     fs.writeFile(
       `${inputDir}/report-${results.js["fetchTime"].replace(/:/g, "_")}.json`,
       results.json,
-      err => {
+      (err) => {
         if (err) reject(err);
         resolve();
       }
@@ -56,23 +56,23 @@ const writeReport = (results, inputDir) => {
   });
 };
 
-const moveOldReport = inputDir => {
+const moveOldReport = (inputDir) => {
   return new Promise((resolve, reject) => {
     fs.promises
       .readdir(`./${inputDir}`)
-      .then(results => {
-        results.forEach(element => {
+      .then((results) => {
+        results.forEach((element) => {
           if (element.indexOf("report-") >= 0) {
             const oldPath = `${inputDir}/${element}`;
             const newPath = `${inputDir}/old-reports/${element}`;
-            fs.rename(oldPath, newPath, err => {
+            fs.rename(oldPath, newPath, (err) => {
               if (err) reject(err);
               resolve(err);
             });
           }
         });
       })
-      .catch(err => {
+      .catch((err) => {
         reject(err);
       });
   });
@@ -81,7 +81,7 @@ const moveOldReport = inputDir => {
 const compareReports = async (inputReport, inputDir) => {
   let directoryFiles = await fs.promises.readdir(`./${inputDir}`);
   let reducedFiles = directoryFiles.filter(
-    file => file.indexOf("report-") >= 0
+    (file) => file.indexOf("report-") >= 0
   );
   const oldReport = JSON.parse(
     fs.readFileSync(`${inputDir}/${reducedFiles}`, "utf8")
@@ -115,7 +115,7 @@ const main = async () => {
     await moveOldReport(dirName);
     await writeReport(lighthouseReport, dirName);
   } else {
-    sites.forEach(async site => {
+    sites.forEach(async (site) => {
       const urlObj = new URL(site);
       let dirName = prepareFolder(urlObj);
       let lighthouseReport = await launchChromeAndRunLighthouse(urlObj.href);
