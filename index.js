@@ -56,25 +56,17 @@ const writeReport = (results, inputDir) => {
   });
 };
 
-const moveOldReport = (inputDir) => {
-  return new Promise((resolve, reject) => {
-    fs.promises
-      .readdir(`./${inputDir}`)
-      .then((results) => {
-        results.forEach((element) => {
-          if (element.indexOf("report-") >= 0) {
-            const oldPath = `${inputDir}/${element}`;
-            const newPath = `${inputDir}/old-reports/${element}`;
-            fs.rename(oldPath, newPath, (err) => {
-              if (err) reject(err);
-              resolve(err);
-            });
-          }
-        });
-      })
-      .catch((err) => {
-        reject(err);
-      });
+const moveOldReport = async (inputDir) => {
+  let foundResults = await fs.promises.readdir(`./${inputDir}`);
+  if (!fs.existsSync(`${inputDir}/old-reports/`)) {
+    fs.mkdirSync(`${inputDir}/old-reports/`);
+  }
+  foundResults.forEach(async (element) => {
+    if (element.indexOf("report-") >= 0) {
+      const oldPath = `${inputDir}/${element}`;
+      const newPath = `${inputDir}/old-reports/${element}`;
+      await fs.promises.rename(oldPath, newPath);
+    }
   });
 };
 
@@ -83,19 +75,22 @@ const compareReports = async (inputReport, inputDir) => {
   let reducedFiles = directoryFiles.filter(
     (file) => file.indexOf("report-") >= 0
   );
-  const oldReport = JSON.parse(
-    fs.readFileSync(`${inputDir}/${reducedFiles}`, "utf8")
-  );
 
-  for (let auditObj in oldReport["audits"]) {
-    if (metricFilter.includes(auditObj)) {
-      let oldValue = oldReport["audits"][auditObj].numericValue;
-      let newValue = inputReport["audits"][auditObj].numericValue;
-      console.log(auditObj);
-      console.log(`    Old value is ${Math.round(oldValue * 100) / 100}`);
-      console.log(`    New value is ${Math.round(newValue * 100) / 100}`);
-      const differenceInAudit = difference(oldValue, newValue);
-      console.log(`    difference is ${differenceInAudit}%\n`);
+  if (reducedFiles.length !== 0) {
+    const oldReport = JSON.parse(
+      fs.readFileSync(`${inputDir}/${reducedFiles}`, "utf8")
+    );
+
+    for (let auditObj in oldReport["audits"]) {
+      if (metricFilter.includes(auditObj)) {
+        let oldValue = oldReport["audits"][auditObj].numericValue;
+        let newValue = inputReport["audits"][auditObj].numericValue;
+        console.log(auditObj);
+        console.log(`    Old value is ${Math.round(oldValue * 100) / 100}`);
+        console.log(`    New value is ${Math.round(newValue * 100) / 100}`);
+        const differenceInAudit = difference(oldValue, newValue);
+        console.log(`    difference is ${differenceInAudit}%\n`);
+      }
     }
   }
 };
@@ -122,7 +117,12 @@ const main = async () => {
 
       compareReports(lighthouseReport.js, dirName);
 
-      await moveOldReport(dirName);
+      try {
+        await moveOldReport(dirName);
+      } catch (toperr) {
+        console.log(toperr);
+      }
+
       await writeReport(lighthouseReport, dirName);
     });
   }
