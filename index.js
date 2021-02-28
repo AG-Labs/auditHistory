@@ -81,17 +81,26 @@ const compareReports = async (inputReport, inputDir) => {
       fs.readFileSync(`${inputDir}/${reducedFiles}`, "utf8")
     );
 
+    let outputString = "";
+
     for (let auditObj in oldReport["audits"]) {
       if (metricFilter.includes(auditObj)) {
         let oldValue = oldReport["audits"][auditObj].numericValue;
         let newValue = inputReport["audits"][auditObj].numericValue;
-        console.log(auditObj);
-        console.log(`    Old value is ${Math.round(oldValue * 100) / 100}`);
-        console.log(`    New value is ${Math.round(newValue * 100) / 100}`);
         const differenceInAudit = difference(oldValue, newValue);
-        console.log(`    difference is ${differenceInAudit}%\n`);
+
+        outputString += auditObj;
+        outputString += `\n    Old value is ${
+          Math.round(oldValue * 100) / 100
+        }`;
+        outputString += `\n    New value is ${
+          Math.round(newValue * 100) / 100
+        }`;
+        outputString += `\n    difference is ${differenceInAudit}%\n\n`;
       }
     }
+    console.log(outputString);
+    fs.writeFileSync(`${inputDir}/differences.txt`, outputString);
   }
 };
 
