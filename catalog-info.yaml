@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: Audit History
+  annotations:
+    github.com/project-slug: AG-Labs/auditHistory
+spec:
+  type: other
+  lifecycle: unknown
+  owner: AG-Labs
