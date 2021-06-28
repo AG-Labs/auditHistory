@@ -4,6 +4,12 @@ metadata:
   name: Audit_History
   annotations:
     github.com/project-slug: AG-Labs/auditHistory
+  tags:
+    - node
+  links:
+    - url: https://developers.google.com/web/tools/lighthouse
+      title: About Lighthouse
+      icon: help
 spec:
   type: other
   lifecycle: unknown
