@@ -108,6 +108,7 @@ const difference = (from, to) => {
 };
 
 const main = async () => {
+  // TODO need a todo to show up in backstage
   if (argv.url) {
     const urlObj = new URL(argv.url);
     let dirName = prepareFolder(urlObj);
@@ -117,6 +118,7 @@ const main = async () => {
     await moveOldReport(dirName);
     await writeReport(lighthouseReport, dirName);
   } else {
+    // TODO need a second one to show up in backstage
     sites.forEach(async (site) => {
       const urlObj = new URL(site);
       let dirName = prepareFolder(urlObj);
